@@ -7,19 +7,19 @@ import "leaflet/dist/leaflet.css";
 
 // Mock crime data for Tamil Nadu
 const crimeData = [
-  { lat: 11.3410, lng: 77.7172, type: "Theft", location: "Erode", intensity: 85, count: 12, details: "Multiple chain snatching incidents reported near bus stand area." },
-  { lat: 11.0168, lng: 76.9558, type: "Assault", location: "Coimbatore", intensity: 72, count: 8, details: "Night-time assault cases in the industrial zone." },
-  { lat: 13.0827, lng: 80.2707, type: "Robbery", location: "Chennai Central", intensity: 90, count: 15, details: "High frequency of mobile snatching near railway station." },
-  { lat: 9.9252, lng: 78.1198, type: "Harassment", location: "Madurai", intensity: 65, count: 6, details: "Eve-teasing incidents near college area." },
-  { lat: 10.7905, lng: 78.7047, type: "Burglary", location: "Trichy", intensity: 55, count: 4, details: "Residential area break-ins during festival season." },
-  { lat: 11.1271, lng: 78.6569, type: "Theft", location: "Namakkal", intensity: 45, count: 3, details: "Vehicle theft cases." },
-  { lat: 11.6643, lng: 78.1460, type: "Murder", location: "Salem", intensity: 78, count: 2, details: "Gang rivalry incidents." },
-  { lat: 8.0883, lng: 77.5385, type: "Theft", location: "Nagercoil", intensity: 40, count: 3, details: "Petty theft cases." },
-  { lat: 12.9165, lng: 79.1325, type: "Assault", location: "Vellore", intensity: 60, count: 5, details: "Road rage incidents." },
-  { lat: 10.3624, lng: 77.9695, type: "Harassment", location: "Dindigul", intensity: 50, count: 4, details: "Public harassment cases." },
-  { lat: 11.3614, lng: 77.5874, type: "Theft", location: "Kavindapadi, Erode", intensity: 82, count: 9, details: "Repeated chain snatching and theft in market area. Mostly at night." },
-  { lat: 13.1289, lng: 80.2083, type: "Robbery", location: "Ambattur, Chennai", intensity: 75, count: 7, details: "Industrial area robberies targeting late-night workers." },
-  { lat: 12.8185, lng: 80.0414, type: "Burglary", location: "Tambaram, Chennai", intensity: 68, count: 5, details: "Residential break-ins in new housing areas." },
+  { lat: 11.3410, lng: 77.7172, type: "Theft", location: "Erode", intensity: 85, count: 12, details: "Multiple chain snatching incidents reported near bus stand area.", isDark: true },
+  { lat: 11.0168, lng: 76.9558, type: "Assault", location: "Coimbatore", intensity: 72, count: 8, details: "Night-time assault cases in the industrial zone.", isDark: true },
+  { lat: 13.0827, lng: 80.2707, type: "Robbery", location: "Chennai Central", intensity: 90, count: 15, details: "High frequency of mobile snatching near railway station.", isDark: false },
+  { lat: 9.9252, lng: 78.1198, type: "Harassment", location: "Madurai", intensity: 65, count: 6, details: "Eve-teasing incidents near college area.", isDark: true },
+  { lat: 10.7905, lng: 78.7047, type: "Burglary", location: "Trichy", intensity: 55, count: 4, details: "Residential area break-ins during festival season.", isDark: false },
+  { lat: 11.1271, lng: 78.6569, type: "Theft", location: "Namakkal", intensity: 45, count: 3, details: "Vehicle theft cases.", isDark: false },
+  { lat: 11.6643, lng: 78.1460, type: "Murder", location: "Salem", intensity: 78, count: 2, details: "Gang rivalry incidents.", isDark: true },
+  { lat: 8.0883, lng: 77.5385, type: "Theft", location: "Nagercoil", intensity: 40, count: 3, details: "Petty theft cases.", isDark: false },
+  { lat: 12.9165, lng: 79.1325, type: "Assault", location: "Vellore", intensity: 60, count: 5, details: "Road rage incidents.", isDark: false },
+  { lat: 10.3624, lng: 77.9695, type: "Harassment", location: "Dindigul", intensity: 50, count: 4, details: "Public harassment cases.", isDark: true },
+  { lat: 11.3614, lng: 77.5874, type: "Theft", location: "Kavindapadi, Erode", intensity: 82, count: 9, details: "Repeated chain snatching and theft in market area. Mostly at night.", isDark: true },
+  { lat: 13.1289, lng: 80.2083, type: "Robbery", location: "Ambattur, Chennai", intensity: 75, count: 7, details: "Industrial area robberies targeting late-night workers.", isDark: true },
+  { lat: 12.8185, lng: 80.0414, type: "Burglary", location: "Tambaram, Chennai", intensity: 68, count: 5, details: "Residential break-ins in new housing areas.", isDark: false },
 ];
 
 const getColor = (intensity: number) => {
@@ -147,7 +147,8 @@ const CrimeMapPage = () => {
             {[
               { color: "bg-neon-red", label: "High Risk" },
               { color: "bg-neon-yellow", label: "Medium Risk" },
-              { color: "bg-neon-green", label: "Low Risk" },
+             { color: "bg-neon-green", label: "Low Risk" },
+              { color: "bg-muted-foreground", label: "Poorly Lit" },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-2">
                 <div className={`w-3 h-3 rounded-full ${item.color}`} />
@@ -207,6 +208,13 @@ const CrimeMapPage = () => {
                   <span className="text-[10px] text-muted-foreground">{selectedCrime.count} incidents</span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{selectedCrime.details}</p>
+
+                {selectedCrime.isDark && (
+                  <div className="mt-2 flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-warning/10 border border-warning/20">
+                    <AlertTriangle className="w-3.5 h-3.5 text-warning flex-shrink-0" />
+                    <span className="text-[11px] text-warning font-semibold">Poorly lit area — Low street lighting detected</span>
+                  </div>
+                )}
 
                 <div className="mt-3 p-2.5 rounded-lg bg-muted/30 border border-border">
                   <div className="flex items-start gap-2">
