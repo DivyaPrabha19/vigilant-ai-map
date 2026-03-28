@@ -26,7 +26,7 @@ const CrimeMapPage = () => {
   const selectCrime = (crime: CrimeEntry) => {
     setSelectedLight(null);
     // Compute adjusted intensity based on nearby lights
-    const nearby = streetLights.filter(
+    const nearby = allLights.filter(
       (l) => Math.abs(l.lat - crime.lat) < 0.05 && Math.abs(l.lng - crime.lng) < 0.05
     );
     const adjusted = getAdjustedRisk(crime.intensity, nearby);
@@ -80,7 +80,7 @@ const CrimeMapPage = () => {
 
     // Street light markers
     const markers: L.Marker[] = [];
-    streetLights.forEach((light) => {
+    allLights.forEach((light) => {
       const c = getLightColor(light.status);
       const glow = light.status === "working" ? `0 0 8px ${c}, 0 0 16px ${c}40` : light.status === "dim" ? `0 0 6px ${c}80` : "none";
       const icon = L.divIcon({
@@ -125,7 +125,7 @@ const CrimeMapPage = () => {
       return;
     }
     // Search in street lights
-    const light = streetLights.find((l) => l.street.toLowerCase().includes(q));
+    const light = allLights.find((l) => l.street.toLowerCase().includes(q));
     if (light && mapInstance.current) {
       mapInstance.current.flyTo([light.lat, light.lng], 16, { duration: 1.5 });
       selectLight(light);
