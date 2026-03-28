@@ -8,6 +8,7 @@ import {
   crimeData, streetLights, CrimeEntry, StreetLight,
   getColor, getRiskLabel, getLightColor, getAdjustedRisk,
 } from "../data/crimeData";
+import { tamilNaduDistricts, getDistrictColor } from "../data/districtCrimeData";
 import StreetLightPanel from "../components/StreetLightPanel";
 
 const CrimeMapPage = () => {
@@ -45,13 +46,30 @@ const CrimeMapPage = () => {
       maxZoom: 19,
     }).addTo(map);
 
-    // Crime markers
-    crimeData.forEach((crime) => {
-      const color = getColor(crime.intensity);
-      const size = Math.max(20, crime.intensity / 2);
+    // District markers (clickable → graph page)
+    tamilNaduDistricts.forEach((dist) => {
+      const color = getDistrictColor(dist.intensity);
+      const size = Math.max(22, dist.intensity / 2.5);
       const icon = L.divIcon({
         className: "custom-marker",
-        html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};opacity:0.7;box-shadow:0 0 ${size}px ${color},0 0 ${size * 2}px ${color}40;animation:pulse 2s ease-in-out infinite;cursor:pointer;"></div>`,
+        html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};opacity:0.75;box-shadow:0 0 ${size}px ${color},0 0 ${size * 2}px ${color}40;animation:pulse 2s ease-in-out infinite;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+          <span style="font-size:7px;font-weight:700;color:#000;text-transform:uppercase;letter-spacing:0.5px;pointer-events:none;">${dist.district.slice(0, 3)}</span>
+        </div>`,
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
+      });
+      L.marker([dist.lat, dist.lng], { icon }).addTo(map).on("click", () => {
+        navigate(`/district/${dist.district.toLowerCase().replace(/\s+/g, "-")}`);
+      });
+    });
+
+    // Crime markers (individual incidents)
+    crimeData.forEach((crime) => {
+      const color = getColor(crime.intensity);
+      const size = Math.max(14, crime.intensity / 3);
+      const icon = L.divIcon({
+        className: "custom-marker",
+        html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};opacity:0.6;box-shadow:0 0 ${size}px ${color};cursor:pointer;"></div>`,
         iconSize: [size, size],
         iconAnchor: [size / 2, size / 2],
       });

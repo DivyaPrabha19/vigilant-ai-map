@@ -10,6 +10,7 @@ import CrimeMapPage from "./pages/CrimeMapPage";
 import RoutePlannerPage from "./pages/RoutePlannerPage";
 import NewsFeedPage from "./pages/NewsFeedPage";
 import EmergencyPage from "./pages/EmergencyPage";
+import DistrictCrimePage from "./pages/DistrictCrimePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/routes" element={<RoutePlannerPage />} />
           <Route path="/news" element={<NewsFeedPage />} />
           <Route path="/emergency" element={<EmergencyPage />} />
+          <Route path="/district/:districtName" element={<DistrictCrimePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
