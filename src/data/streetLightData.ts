@@ -135,17 +135,73 @@ export const allDistrictStreetLights: DistrictStreetLights[] = [
   {
     district: "Erode",
     lights: makeLights([
-      { name: "Erode Town", lat: 11.3410, lng: 77.7172, lights: [
-        { street: "EVN Road, Erode", status: "working", lightingScore: 82 },
-        { street: "Brough Road, Erode", status: "dim", lightingScore: 40 },
+      { name: "Erode City", lat: 11.3410, lng: 77.7172, lights: [
+        { street: "EVN Road, Erode City", status: "working", lightingScore: 82 },
+        { street: "Brough Road, Erode City", status: "dim", lightingScore: 40 },
+        { street: "Cauvery Bridge Rd, Erode City", status: "working", lightingScore: 78 },
+      ]},
+      { name: "Perundurai", lat: 11.2750, lng: 77.5870, lights: [
+        { street: "Main Road, Perundurai", status: "working", lightingScore: 75 },
+        { street: "Industrial Area Rd, Perundurai", status: "dim", lightingScore: 38 },
+      ]},
+      { name: "Gobichettipalayam", lat: 11.4550, lng: 77.4370, lights: [
+        { street: "Sathy Road, Gobichettipalayam", status: "working", lightingScore: 80 },
+        { street: "Bus Stand Rd, Gobichettipalayam", status: "dim", lightingScore: 42 },
+        { street: "Bazar Street, Gobichettipalayam", status: "broken", lightingScore: 8 },
+      ]},
+      { name: "Sathyamangalam", lat: 11.5050, lng: 77.2380, lights: [
+        { street: "Mysore Road, Sathyamangalam", status: "dim", lightingScore: 35 },
+        { street: "Forest Range Rd, Sathyamangalam", status: "broken", lightingScore: 5 },
+        { street: "Main Bazaar, Sathyamangalam", status: "working", lightingScore: 72 },
       ]},
       { name: "Bhavani", lat: 11.4500, lng: 77.6800, lights: [
-        { street: "Main Bazaar, Bhavani", status: "broken", lightingScore: 10 },
+        { street: "Sangam Road, Bhavani", status: "working", lightingScore: 76 },
         { street: "Temple Street, Bhavani", status: "dim", lightingScore: 35 },
+        { street: "Main Bazaar, Bhavani", status: "broken", lightingScore: 10 },
       ]},
-      { name: "Kavindapadi", lat: 11.3614, lng: 77.5874, lights: [
-        { street: "Market Road, Kavindapadi", status: "broken", lightingScore: 5 },
-        { street: "Bus Stand Road, Kavindapadi", status: "dim", lightingScore: 28 },
+      { name: "Anthiyur", lat: 11.5720, lng: 77.5890, lights: [
+        { street: "Sathy Road, Anthiyur", status: "dim", lightingScore: 32 },
+        { street: "Market Street, Anthiyur", status: "broken", lightingScore: 5 },
+      ]},
+      { name: "Modakurichi", lat: 11.3030, lng: 77.7830, lights: [
+        { street: "Main Road, Modakurichi", status: "dim", lightingScore: 38 },
+        { street: "Village Rd, Modakurichi", status: "broken", lightingScore: 8 },
+      ]},
+      { name: "Kodumudi", lat: 11.0770, lng: 77.8870, lights: [
+        { street: "Temple Road, Kodumudi", status: "working", lightingScore: 70 },
+        { street: "River Bank Rd, Kodumudi", status: "dim", lightingScore: 30 },
+      ]},
+      { name: "Nambiyur", lat: 11.3560, lng: 77.3280, lights: [
+        { street: "Gobi Road, Nambiyur", status: "dim", lightingScore: 35 },
+        { street: "Bazaar Street, Nambiyur", status: "broken", lightingScore: 5 },
+      ]},
+      { name: "Chennimalai", lat: 11.1630, lng: 77.6020, lights: [
+        { street: "Hill Temple Rd, Chennimalai", status: "working", lightingScore: 68 },
+        { street: "Market Street, Chennimalai", status: "dim", lightingScore: 32 },
+      ]},
+      { name: "Punjai Puliampatti", lat: 11.3450, lng: 77.1620, lights: [
+        { street: "Main Road, Punjai Puliampatti", status: "broken", lightingScore: 8 },
+        { street: "School Road, Punjai Puliampatti", status: "dim", lightingScore: 25 },
+      ]},
+      { name: "Bhavanisagar", lat: 11.4720, lng: 77.0880, lights: [
+        { street: "Dam Road, Bhavanisagar", status: "working", lightingScore: 72 },
+        { street: "Colony Road, Bhavanisagar", status: "dim", lightingScore: 38 },
+      ]},
+      { name: "Ammapet", lat: 11.3510, lng: 77.7050, lights: [
+        { street: "Junction Road, Ammapet", status: "working", lightingScore: 75 },
+        { street: "Bypass Road, Ammapet", status: "dim", lightingScore: 40 },
+      ]},
+      { name: "Arachalur", lat: 11.2380, lng: 77.6850, lights: [
+        { street: "Perundurai Road, Arachalur", status: "dim", lightingScore: 36 },
+        { street: "Village Main Rd, Arachalur", status: "broken", lightingScore: 5 },
+      ]},
+      { name: "Kasipalayam", lat: 11.3300, lng: 77.7400, lights: [
+        { street: "Erode Road, Kasipalayam", status: "dim", lightingScore: 38 },
+        { street: "Inner Street, Kasipalayam", status: "broken", lightingScore: 10 },
+      ]},
+      { name: "Thalavadi", lat: 11.7420, lng: 77.0040, lights: [
+        { street: "Forest Road, Thalavadi", status: "broken", lightingScore: 3 },
+        { street: "Tribal Colony Rd, Thalavadi", status: "broken", lightingScore: 5 },
       ]},
     ]),
   },
