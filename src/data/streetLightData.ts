@@ -5,15 +5,33 @@ export interface DistrictStreetLights {
   lights: StreetLight[];
 }
 
+// Generate a recent human-readable timestamp
+const recentTime = (minutesAgo: number): string => {
+  if (minutesAgo < 60) return `${minutesAgo} min ago`;
+  const hrs = Math.floor(minutesAgo / 60);
+  if (hrs < 24) return `${hrs} hr${hrs > 1 ? "s" : ""} ago`;
+  return "1 day ago";
+};
+
+// Seeded random for consistent but recent-looking timestamps
+const recentChecked = (seed: number): string => {
+  const options = [3, 8, 12, 18, 25, 35, 45, 60, 90, 120, 180];
+  return recentTime(options[seed % options.length]);
+};
+
 // Helper to generate lights for a district given town centers
+type LightInput = { street: string; status: "working" | "dim" | "broken"; lightingScore: number };
 const makeLights = (
-  towns: { name: string; lat: number; lng: number; lights: Omit<StreetLight, "lat" | "lng">[] }[]
+  towns: { name: string; lat: number; lng: number; lights: LightInput[] }[]
 ): StreetLight[] =>
-  towns.flatMap((t) =>
+  towns.flatMap((t, ti) =>
     t.lights.map((l, i) => ({
       lat: t.lat + (i % 2 === 0 ? 0.002 : -0.002) * (i + 1),
       lng: t.lng + (i % 2 === 0 ? -0.001 : 0.003) * (i + 1),
-      ...l,
+      street: l.street,
+      status: l.status,
+      lightingScore: l.lightingScore,
+      lastChecked: recentChecked(ti * 7 + i * 3 + l.lightingScore),
     }))
   );
 
