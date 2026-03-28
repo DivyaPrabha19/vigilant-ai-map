@@ -1,11 +1,13 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, AlertTriangle, MapPin, TrendingUp, Shield } from "lucide-react";
+import { ArrowLeft, AlertTriangle, MapPin, TrendingUp, Shield, Lightbulb, Clock } from "lucide-react";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from "recharts";
 import { tamilNaduDistricts, getDistrictColor, getDistrictRiskLabel } from "../data/districtCrimeData";
+import { getDistrictLights, getDistrictLightingSummary } from "../data/streetLightData";
+import { getLightColor, getLightLabel } from "../data/crimeData";
 
 const CHART_COLORS = [
   "hsl(0, 100%, 55%)",
@@ -61,6 +63,10 @@ const DistrictCrimePage = () => {
   const color = getDistrictColor(district.intensity);
   const risk = getDistrictRiskLabel(district.intensity);
 
+  // Lighting data
+  const lights = getDistrictLights(district.district);
+  const lightingSummary = getDistrictLightingSummary(district.district);
+
   // Trend data for line chart
   const trendData = district.years.map((year, i) => ({
     year: year.toString(),
@@ -86,6 +92,8 @@ const DistrictCrimePage = () => {
     cases: district.crimeBreakdown[key][latestIdx],
   }));
 
+  const lightScoreColor = lightingSummary.avgScore >= 60 ? "hsl(145, 100%, 50%)" : lightingSummary.avgScore >= 35 ? "hsl(45, 100%, 55%)" : "hsl(0, 100%, 55%)";
+
   return (
     <div className="min-h-screen bg-background pb-8">
       {/* Header */}
@@ -105,21 +113,26 @@ const DistrictCrimePage = () => {
 
       <div className="p-4 space-y-4">
         {/* Summary Cards */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-2">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass rounded-xl p-3 text-center">
             <Shield className="w-5 h-5 mx-auto mb-1 text-primary" />
             <p className="text-lg font-bold font-display text-foreground">{district.intensity}</p>
-            <p className="text-[10px] text-muted-foreground uppercase">Risk Score</p>
+            <p className="text-[9px] text-muted-foreground uppercase">Risk Score</p>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass rounded-xl p-3 text-center">
             <TrendingUp className="w-5 h-5 mx-auto mb-1 text-neon-yellow" />
             <p className="text-lg font-bold font-display text-foreground">{district.totalCases.toLocaleString()}</p>
-            <p className="text-[10px] text-muted-foreground uppercase">Total Cases</p>
+            <p className="text-[9px] text-muted-foreground uppercase">Total Cases</p>
           </motion.div>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass rounded-xl p-3 text-center">
             <MapPin className="w-5 h-5 mx-auto mb-1 text-neon-magenta" />
             <p className="text-lg font-bold font-display text-foreground">{district.mainTowns.length}</p>
-            <p className="text-[10px] text-muted-foreground uppercase">Main Towns</p>
+            <p className="text-[9px] text-muted-foreground uppercase">Main Towns</p>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass rounded-xl p-3 text-center">
+            <Lightbulb className="w-5 h-5 mx-auto mb-1" style={{ color: lightScoreColor }} />
+            <p className="text-lg font-bold font-display text-foreground">{lightingSummary.avgScore}%</p>
+            <p className="text-[9px] text-muted-foreground uppercase">Lighting</p>
           </motion.div>
         </div>
 
@@ -130,6 +143,65 @@ const DistrictCrimePage = () => {
             <span className="text-xs text-warning font-semibold">Poorly lit areas detected in this district</span>
           </div>
         )}
+
+        {/* Street Lighting Overview */}
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="glass rounded-xl p-4">
+          <h3 className="text-xs font-bold font-display text-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+            <Lightbulb className="w-4 h-4 text-neon-yellow" />
+            Street Lighting Status
+          </h3>
+          {/* Summary bars */}
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            <div className="rounded-lg bg-neon-green/10 border border-neon-green/20 p-2 text-center">
+              <p className="text-lg font-bold font-display text-neon-green">{lightingSummary.working}</p>
+              <p className="text-[9px] text-muted-foreground uppercase">Working</p>
+            </div>
+            <div className="rounded-lg bg-neon-yellow/10 border border-neon-yellow/20 p-2 text-center">
+              <p className="text-lg font-bold font-display text-neon-yellow">{lightingSummary.dim}</p>
+              <p className="text-[9px] text-muted-foreground uppercase">Dim</p>
+            </div>
+            <div className="rounded-lg bg-neon-red/10 border border-neon-red/20 p-2 text-center">
+              <p className="text-lg font-bold font-display text-neon-red">{lightingSummary.broken}</p>
+              <p className="text-[9px] text-muted-foreground uppercase">Broken</p>
+            </div>
+          </div>
+          {/* Individual street lights */}
+          <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+            {lights.map((light, i) => {
+              const lc = getLightColor(light.status);
+              return (
+                <div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-muted/30 border border-border">
+                  <div className="w-3 h-3 rounded-sm flex-shrink-0" style={{ backgroundColor: lc, boxShadow: light.status === "working" ? `0 0 8px ${lc}` : "none" }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-foreground truncate">{light.street}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[10px] font-semibold" style={{ color: lc }}>
+                        {light.status === "working" ? "✓ Working" : light.status === "dim" ? "◐ Dim" : "✕ Broken"}
+                      </span>
+                      <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground">
+                        <Clock className="w-2.5 h-2.5" />{light.lastChecked}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-sm font-bold font-display" style={{ color: lc }}>{light.lightingScore}%</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {/* Avg lighting impact on risk */}
+          <div className="mt-3 p-2.5 rounded-lg bg-muted/30 border border-border">
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              Average lighting score: <span className="font-bold" style={{ color: lightScoreColor }}>{lightingSummary.avgScore}%</span>.
+              {lightingSummary.avgScore < 40
+                ? " Poor lighting significantly increases night-time risk in this district."
+                : lightingSummary.avgScore < 65
+                ? " Moderate lighting — some areas need improvement for safety."
+                : " Good lighting coverage — contributes to lower night-time risk."}
+            </p>
+          </div>
+        </motion.div>
 
         {/* Main Towns */}
         <div className="glass rounded-xl p-4">
