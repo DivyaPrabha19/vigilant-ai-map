@@ -108,6 +108,13 @@ const CrimeMapPage = () => {
 
   const handleSearch = () => {
     const q = searchQuery.toLowerCase();
+    // Search districts first
+    const dist = tamilNaduDistricts.find((d) => d.district.toLowerCase().includes(q) || d.mainTowns.some((t) => t.toLowerCase().includes(q)));
+    if (dist && mapInstance.current) {
+      mapInstance.current.flyTo([dist.lat, dist.lng], 11, { duration: 1.5 });
+      navigate(`/district/${dist.district.toLowerCase().replace(/\s+/g, "-")}`);
+      return;
+    }
     // Search in crimes
     const found = crimeData.find((c) => c.location.toLowerCase().includes(q));
     if (found && mapInstance.current) {
