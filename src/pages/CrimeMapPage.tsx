@@ -5,10 +5,11 @@ import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import {
-  crimeData, streetLights, CrimeEntry, StreetLight,
+  crimeData, CrimeEntry, StreetLight,
   getColor, getRiskLabel, getLightColor, getAdjustedRisk,
 } from "../data/crimeData";
 import { tamilNaduDistricts, getDistrictColor } from "../data/districtCrimeData";
+import { getAllStreetLights } from "../data/streetLightData";
 import StreetLightPanel from "../components/StreetLightPanel";
 
 const CrimeMapPage = () => {
