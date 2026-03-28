@@ -14,6 +14,8 @@ import StreetLightPanel from "../components/StreetLightPanel";
 
 const CrimeMapPage = () => {
   const navigate = useNavigate();
+  const allLights = getAllStreetLights();
+  const navigate = useNavigate();
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
   const [selectedCrime, setSelectedCrime] = useState<CrimeEntry | null>(null);
