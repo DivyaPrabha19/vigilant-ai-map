@@ -20,7 +20,7 @@ const recentChecked = (seed: number): string => {
 };
 
 // Helper to generate lights for a district given town centers
-type LightInput = { street: string; status: "working" | "dim" | "broken"; lightingScore: number };
+type LightInput = { street: string; status: "working" | "dim" | "broken"; lightingScore: number; lastChecked?: string };
 const makeLights = (
   towns: { name: string; lat: number; lng: number; lights: LightInput[] }[]
 ): StreetLight[] =>
