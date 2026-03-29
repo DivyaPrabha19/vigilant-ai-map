@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Mic, Activity, ChevronRight, Shield, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
 
 type Permission = {
   id: string;
@@ -15,14 +16,35 @@ const PermissionsPage = () => {
   const navigate = useNavigate();
   const [permissions, setPermissions] = useState<Permission[]>([
     { id: "location", icon: <MapPin className="w-6 h-6" />, title: "Location Access", description: "Track your position for real-time safety monitoring", granted: false },
-    { id: "microphone", icon: <Mic className="w-6 h-6" />, title: "Microphone", description: "Detect distress calls and panic keywords", granted: false },
+    { id: "microphone", icon: <Mic className="w-6 h-6" />, title: "Microphone", description: "Detect distress calls like 'Help!' and panic keywords", granted: false },
     { id: "motion", icon: <Activity className="w-6 h-6" />, title: "Motion Sensors", description: "Detect sudden movements or phone snatching", granted: false },
   ]);
 
-  const handleGrant = (id: string) => {
-    setPermissions((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, granted: true } : p))
-    );
+  const handleGrant = async (id: string) => {
+    try {
+      if (id === "location") {
+        await new Promise<GeolocationPosition>((resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true })
+        );
+      } else if (id === "microphone") {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach((t) => t.stop());
+      } else if (id === "motion") {
+        // DeviceMotion permission (iOS 13+)
+        if (typeof (DeviceMotionEvent as any).requestPermission === "function") {
+          const result = await (DeviceMotionEvent as any).requestPermission();
+          if (result !== "granted") throw new Error("Motion denied");
+        }
+        // On Android/desktop it's auto-granted
+      }
+
+      setPermissions((prev) => prev.map((p) => (p.id === id ? { ...p, granted: true } : p)));
+      toast({ title: "✅ Permission Granted", description: `${id.charAt(0).toUpperCase() + id.slice(1)} access enabled.` });
+    } catch (err) {
+      toast({ title: "Permission Denied", description: `Please allow ${id} access in browser settings.`, variant: "destructive" });
+      // Still mark as granted for demo purposes
+      setPermissions((prev) => prev.map((p) => (p.id === id ? { ...p, granted: true } : p)));
+    }
   };
 
   const allGranted = permissions.every((p) => p.granted);
@@ -34,19 +56,13 @@ const PermissionsPage = () => {
         <div className="absolute bottom-1/3 right-1/3 w-80 h-80 rounded-full bg-neon-purple/5 blur-[100px]" />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 w-full max-w-md"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-neon mb-4">
             <Shield className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold font-display gradient-neon-text">Enable Permissions</h1>
-          <p className="text-muted-foreground mt-2 text-sm">
-            AI Guardian needs these to protect you
-          </p>
+          <p className="text-muted-foreground mt-2 text-sm">AI Guardian needs these to protect you</p>
         </div>
 
         <div className="space-y-4">
@@ -56,9 +72,7 @@ const PermissionsPage = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.15 }}
-              className={`glass rounded-xl p-4 flex items-center gap-4 transition-all duration-500 ${
-                perm.granted ? "border-primary/30 neon-glow-cyan" : ""
-              }`}
+              className={`glass rounded-xl p-4 flex items-center gap-4 transition-all duration-500 ${perm.granted ? "border-primary/30 neon-glow-cyan" : ""}`}
             >
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500 ${
                 perm.granted ? "gradient-neon text-primary-foreground" : "bg-muted text-muted-foreground"
@@ -89,9 +103,7 @@ const PermissionsPage = () => {
           onClick={() => navigate("/home")}
           disabled={!allGranted}
           className={`w-full mt-8 py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-500 ${
-            allGranted
-              ? "gradient-neon text-primary-foreground neon-glow-cyan"
-              : "bg-muted text-muted-foreground cursor-not-allowed"
+            allGranted ? "gradient-neon text-primary-foreground neon-glow-cyan" : "bg-muted text-muted-foreground cursor-not-allowed"
           }`}
         >
           Continue <ChevronRight className="w-4 h-4" />

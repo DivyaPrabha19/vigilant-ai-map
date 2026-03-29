@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, ShieldCheck, Map, Newspaper, Route, AlertTriangle, Menu, X } from "lucide-react";
+import { Shield, ShieldCheck, Map, Newspaper, Route, AlertTriangle, Menu, X, Mic, MicOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SafetyToggle from "@/components/SafetyToggle";
 import StatusPanel from "@/components/StatusPanel";
+import { useVoiceDetection } from "@/hooks/useVoiceDetection";
+import { useLocationTracking } from "@/hooks/useLocationTracking";
 
 const HomePage = () => {
   const [safetyMode, setSafetyMode] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { isListening, lastDetected } = useVoiceDetection(safetyMode);
+  useLocationTracking(safetyMode);
 
   const navItems = [
     { icon: <Map className="w-5 h-5" />, label: "Crime Map", path: "/map" },
@@ -23,11 +27,7 @@ const HomePage = () => {
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full bg-neon-cyan/3 blur-[150px]" />
         {safetyMode && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="absolute inset-0"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full border border-neon-cyan/10 animate-pulse-ring" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full border border-neon-cyan/10 animate-pulse-ring" style={{ animationDelay: "0.7s" }} />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full border border-neon-cyan/10 animate-pulse-ring" style={{ animationDelay: "1.4s" }} />
@@ -46,9 +46,23 @@ const HomePage = () => {
             <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Safety System</p>
           </div>
         </div>
-        <button onClick={() => setMenuOpen(!menuOpen)} className="w-10 h-10 rounded-xl glass flex items-center justify-center text-foreground">
-          {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Voice indicator */}
+          {safetyMode && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                isListening ? "bg-neon-cyan/10 text-neon-cyan" : "bg-destructive/10 text-destructive"
+              }`}
+            >
+              {isListening ? <Mic className="w-5 h-5 animate-pulse" /> : <MicOff className="w-5 h-5" />}
+            </motion.div>
+          )}
+          <button onClick={() => setMenuOpen(!menuOpen)} className="w-10 h-10 rounded-xl glass flex items-center justify-center text-foreground">
+            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </header>
 
       {/* Menu overlay */}
@@ -76,7 +90,6 @@ const HomePage = () => {
 
       {/* Main content */}
       <main className="relative z-10 flex flex-col items-center justify-center px-4 pt-8 pb-24">
-        {/* Status */}
         <AnimatePresence mode="wait">
           <motion.div
             key={safetyMode ? "active" : "inactive"}
@@ -96,13 +109,20 @@ const HomePage = () => {
                 ? "Monitoring your surroundings in real-time. Voice, motion, and location sensors are active."
                 : "Enable Safety Mode to activate AI-powered protection."}
             </p>
+            {safetyMode && lastDetected && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-destructive text-xs mt-2 font-semibold"
+              >
+                ⚠️ Last distress keyword detected: "{lastDetected}"
+              </motion.p>
+            )}
           </motion.div>
         </AnimatePresence>
 
-        {/* Toggle */}
         <SafetyToggle enabled={safetyMode} onToggle={() => setSafetyMode(!safetyMode)} />
 
-        {/* Status panels when active */}
         <AnimatePresence>
           {safetyMode && <StatusPanel />}
         </AnimatePresence>
