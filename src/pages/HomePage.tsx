@@ -42,7 +42,7 @@ const HomePage = () => {
             <Shield className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-lg font-bold font-display gradient-neon-text">AI GUARDIAN</h1>
+            <h1 className="text-lg font-bold font-display gradient-neon-text">TRUVIA PATH</h1>
             <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Safety System</p>
           </div>
         </div>
@@ -102,7 +102,7 @@ const HomePage = () => {
               safetyMode ? "bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/20" : "bg-muted text-muted-foreground"
             }`}>
               {safetyMode ? <ShieldCheck className="w-3.5 h-3.5" /> : <Shield className="w-3.5 h-3.5" />}
-              {safetyMode ? "AI Guardian is Active" : "Safety Mode Off"}
+              {safetyMode ? "Truvia Path is Active" : "Safety Mode Off"}
             </div>
             <p className="text-muted-foreground text-sm max-w-xs mx-auto">
               {safetyMode

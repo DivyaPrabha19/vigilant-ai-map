@@ -29,7 +29,7 @@ export const crimeData: CrimeEntry[] = [
   { lat: 8.0883, lng: 77.5385, type: "Theft", location: "Nagercoil", intensity: 40, count: 3, details: "Petty theft cases.", isDark: false },
   { lat: 12.9165, lng: 79.1325, type: "Assault", location: "Vellore", intensity: 60, count: 5, details: "Road rage incidents.", isDark: false },
   { lat: 10.3624, lng: 77.9695, type: "Harassment", location: "Dindigul", intensity: 50, count: 4, details: "Public harassment cases.", isDark: true },
-  { lat: 11.3614, lng: 77.5874, type: "Theft", location: "Kavindapadi, Erode", intensity: 82, count: 9, details: "Repeated chain snatching and theft in market area. Mostly at night.", isDark: true },
+  
   { lat: 13.1289, lng: 80.2083, type: "Robbery", location: "Ambattur, Chennai", intensity: 75, count: 7, details: "Industrial area robberies targeting late-night workers.", isDark: true },
   { lat: 12.8185, lng: 80.0414, type: "Burglary", location: "Tambaram, Chennai", intensity: 68, count: 5, details: "Residential break-ins in new housing areas.", isDark: false },
 ];

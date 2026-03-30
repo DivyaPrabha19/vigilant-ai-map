@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Phone, MapPin, Shield, AlertTriangle, Send, UserPlus, Siren, User } from "lucide-react";
+import { ArrowLeft, Phone, MapPin, Shield, AlertTriangle, Send, UserPlus, Siren, User, Share2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEmergencyContacts } from "@/contexts/EmergencyContactsContext";
 
@@ -14,25 +14,42 @@ const EmergencyPage = () => {
 
   const triggerSOS = () => {
     setAlertTriggered(true);
+    sendLocationToContacts();
+  };
 
+  const sendLocationToContacts = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           const locationUrl = `https://maps.google.com/maps?q=${latitude},${longitude}`;
           const message = `🚨 EMERGENCY SOS! I need help urgently! My live location: ${locationUrl}`;
-
           contacts.forEach((contact) => {
-            const smsUrl = `sms:${contact.phone}?body=${encodeURIComponent(message)}`;
-            window.open(smsUrl, "_blank");
+            window.open(`sms:${contact.phone}?body=${encodeURIComponent(message)}`, "_blank");
           });
         },
         () => {
           const message = `🚨 EMERGENCY SOS! I need help urgently! Location unavailable.`;
           contacts.forEach((contact) => {
-            const smsUrl = `sms:${contact.phone}?body=${encodeURIComponent(message)}`;
-            window.open(smsUrl, "_blank");
+            window.open(`sms:${contact.phone}?body=${encodeURIComponent(message)}`, "_blank");
           });
+        },
+        { enableHighAccuracy: true }
+      );
+    }
+  };
+
+  const shareLocationTo = (phone: string) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const locationUrl = `https://maps.google.com/maps?q=${latitude},${longitude}`;
+          const message = `📍 Here is my current live location: ${locationUrl}`;
+          window.open(`sms:${phone}?body=${encodeURIComponent(message)}`, "_blank");
+        },
+        () => {
+          window.open(`sms:${phone}?body=${encodeURIComponent("📍 Tried to share location but access was denied.")}`, "_blank");
         },
         { enableHighAccuracy: true }
       );
@@ -95,7 +112,7 @@ const EmergencyPage = () => {
               <div className="space-y-2 text-xs text-muted-foreground">
                 <p className="flex items-center gap-2"><Send className="w-3 h-3 text-neon-cyan" /> SMS sent to {contacts.length} emergency contacts</p>
                 <p className="flex items-center gap-2"><MapPin className="w-3 h-3 text-neon-cyan" /> Live location shared</p>
-                <p className="flex items-center gap-2"><Shield className="w-3 h-3 text-neon-cyan" /> Alert: Location + Timestamp + Risk reason</p>
+                <p className="flex items-center gap-2"><Shield className="w-3 h-3 text-neon-cyan" /> Alert: Location + Timestamp</p>
               </div>
               <motion.button
                 whileTap={{ scale: 0.98 }}
@@ -130,9 +147,20 @@ const EmergencyPage = () => {
                   <p className="text-sm font-semibold text-foreground">{contact.name}</p>
                   <p className="text-[11px] text-muted-foreground">{contact.phone}</p>
                 </div>
-                <a href={`tel:${contact.phone}`} className="w-9 h-9 rounded-lg bg-neon-cyan/10 flex items-center justify-center text-neon-cyan">
-                  <Phone className="w-4 h-4" />
-                </a>
+                <div className="flex items-center gap-2">
+                  {/* Share Location button */}
+                  <button
+                    onClick={() => shareLocationTo(contact.phone)}
+                    className="w-9 h-9 rounded-lg bg-neon-magenta/10 flex items-center justify-center text-neon-magenta"
+                    title="Share live location via SMS"
+                  >
+                    <Share2 className="w-4 h-4" />
+                  </button>
+                  {/* Call button */}
+                  <a href={`tel:${contact.phone}`} className="w-9 h-9 rounded-lg bg-neon-cyan/10 flex items-center justify-center text-neon-cyan">
+                    <Phone className="w-4 h-4" />
+                  </a>
+                </div>
               </motion.div>
             ))}
           </div>
