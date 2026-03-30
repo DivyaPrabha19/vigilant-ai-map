@@ -65,6 +65,21 @@ const CrimeMapPage = () => {
       maxZoom: 19,
     }).addTo(map);
 
+    // Enable user's live location on the map
+    map.locate({ setView: false, watch: true, enableHighAccuracy: true });
+    map.on("locationfound", (e: L.LocationEvent) => {
+      const radius = e.accuracy / 2;
+      L.circleMarker(e.latlng, {
+        radius: 8,
+        fillColor: "hsl(185, 100%, 50%)",
+        color: "hsl(185, 100%, 70%)",
+        weight: 3,
+        opacity: 1,
+        fillOpacity: 0.9,
+      }).addTo(map).bindPopup(`📍 You are here (±${Math.round(radius)}m)`);
+      L.circle(e.latlng, { radius, color: "hsl(185, 100%, 50%)", fillOpacity: 0.08, weight: 1 }).addTo(map);
+    });
+
     tamilNaduDistricts.forEach((dist) => {
       const color = getDistrictColor(dist.intensity);
       const size = Math.max(22, dist.intensity / 2.5);
