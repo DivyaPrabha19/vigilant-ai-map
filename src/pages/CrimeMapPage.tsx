@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Search, AlertTriangle, Info, Lightbulb } from "lucide-react";
+import { ArrowLeft, Search, AlertTriangle, Info, Lightbulb, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
