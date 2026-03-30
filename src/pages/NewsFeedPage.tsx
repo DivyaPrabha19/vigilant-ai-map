@@ -1,57 +1,127 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, AlertTriangle, Clock, MapPin, ExternalLink } from "lucide-react";
+import { ArrowLeft, AlertTriangle, Clock, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const newsItems = [
   {
     id: 1,
-    title: "Chain snatching incidents rise in Kavindapadi market area",
-    location: "Kavindapadi, Erode",
-    district: "Erode",
-    type: "Theft",
-    time: "2 hours ago",
+    title: "Woman stalked and harassed near Coimbatore college campus",
+    location: "Gandhipuram, Coimbatore",
+    district: "Coimbatore",
+    type: "Harassment",
+    time: "1 hour ago",
     breaking: true,
-    summary: "Police report 3 chain snatching incidents in the last 48 hours near the main market area. Suspects fled on two-wheelers.",
+    summary: "A 21-year-old college student reported being stalked for weeks near campus. Police have arrested the suspect and increased patrol around educational institutions.",
   },
   {
     id: 2,
-    title: "Night assault case reported near Erode bus stand",
-    location: "Erode Bus Stand",
-    district: "Erode",
-    type: "Assault",
-    time: "5 hours ago",
-    breaking: false,
-    summary: "A 32-year-old man was assaulted by unknown persons near the bus stand at 11 PM. Police investigating CCTV footage.",
+    title: "Two arrested for attempted kidnapping of minor girl in Salem",
+    location: "Hasthampatti, Salem",
+    district: "Salem",
+    type: "Kidnapping",
+    time: "3 hours ago",
+    breaking: true,
+    summary: "Police arrested two men for attempting to kidnap a 14-year-old girl near her school. Swift action by bystanders helped foil the attempt.",
   },
   {
     id: 3,
-    title: "Mobile snatching gang busted in Chennai Central",
-    location: "Chennai Central",
+    title: "Woman assaulted while returning from night shift in Chennai",
+    location: "Sholinganallur, Chennai",
     district: "Chennai",
-    type: "Robbery",
-    time: "8 hours ago",
-    breaking: true,
-    summary: "A gang of 5 involved in mobile phone snatching near railway station arrested. 42 stolen phones recovered.",
+    type: "Assault",
+    time: "5 hours ago",
+    breaking: false,
+    summary: "A 28-year-old IT employee was assaulted by two unknown men while walking to her PG from the bus stop at 11 PM. CCTV footage being analyzed.",
   },
   {
     id: 4,
-    title: "Residential burglary attempt foiled in Tambaram",
-    location: "Tambaram, Chennai",
-    district: "Chennai",
-    type: "Burglary",
-    time: "12 hours ago",
+    title: "Chain snatching targets women in Madurai market area",
+    location: "Meenakshi Amman, Madurai",
+    district: "Madurai",
+    type: "Theft",
+    time: "6 hours ago",
     breaking: false,
-    summary: "Alert neighbors helped prevent a burglary attempt in a residential colony. One suspect apprehended.",
+    summary: "Three women had their gold chains snatched by bike-borne miscreants near the temple market. Police have deployed plainclothes officers.",
   },
   {
     id: 5,
-    title: "Eve-teasing complaint filed near Madurai college",
-    location: "Anna Nagar, Madurai",
-    district: "Madurai",
+    title: "Domestic violence complaint leads to husband's arrest in Trichy",
+    location: "Srirangam, Tiruchirappalli",
+    district: "Tiruchirappalli",
+    type: "Assault",
+    time: "8 hours ago",
+    breaking: false,
+    summary: "Woman filed dowry harassment and assault case. Husband and in-laws arrested under Dowry Prohibition Act. Victim shifted to shelter home.",
+  },
+  {
+    id: 6,
+    title: "Eve-teasing gang busted near Erode bus stand",
+    location: "Erode City, Erode",
+    district: "Erode",
+    type: "Harassment",
+    time: "10 hours ago",
+    breaking: true,
+    summary: "A gang of 4 men involved in serial eve-teasing near the bus stand area has been arrested. 12 complaints from women were linked to the group.",
+  },
+  {
+    id: 7,
+    title: "Woman's phone snatched at knifepoint in Tirunelveli",
+    location: "Palayamkottai, Tirunelveli",
+    district: "Tirunelveli",
+    type: "Robbery",
+    time: "12 hours ago",
+    breaking: false,
+    summary: "A 25-year-old woman was robbed of her phone and purse at knifepoint while walking alone at night. Suspect identified via CCTV.",
+  },
+  {
+    id: 8,
+    title: "Acid attack attempt foiled in Vellore; man arrested",
+    location: "Katpadi, Vellore",
+    district: "Vellore",
+    type: "Assault",
+    time: "14 hours ago",
+    breaking: true,
+    summary: "Police arrested a 30-year-old man for attempting acid attack on a woman who rejected his advances. Alert passersby intervened and saved the victim.",
+  },
+  {
+    id: 9,
+    title: "Cyberstalking case: Woman harassed online in Tiruppur",
+    location: "Tiruppur City, Tiruppur",
+    district: "Tiruppur",
+    type: "Harassment",
+    time: "16 hours ago",
+    breaking: false,
+    summary: "A textile worker lodged a complaint about receiving threatening messages and morphed images online. Cyber cell has traced the accused.",
+  },
+  {
+    id: 10,
+    title: "Woman auto driver robbed at night in Thanjavur",
+    location: "Kumbakonam, Thanjavur",
+    district: "Thanjavur",
+    type: "Robbery",
+    time: "18 hours ago",
+    breaking: false,
+    summary: "A woman auto driver was robbed of her day's earnings by two men who posed as passengers. Investigation underway.",
+  },
+  {
+    id: 11,
+    title: "Missing girl found safe in Dindigul after 48 hours",
+    location: "Palani, Dindigul",
+    district: "Dindigul",
+    type: "Kidnapping",
+    time: "1 day ago",
+    breaking: false,
+    summary: "A 16-year-old girl who went missing from her home was found safe by police. One suspect detained for questioning.",
+  },
+  {
+    id: 12,
+    title: "Sexual harassment complaint filed against employer in Cuddalore",
+    location: "Chidambaram, Cuddalore",
+    district: "Cuddalore",
     type: "Harassment",
     time: "1 day ago",
     breaking: false,
-    summary: "A college student filed a complaint about repeated harassment near the campus entrance. Police patrol increased.",
+    summary: "A factory worker filed a sexual harassment complaint against her supervisor. Police have registered a case under POCSO and IPC sections.",
   },
 ];
 
@@ -63,6 +133,7 @@ const getTypeColor = (type: string) => {
     Burglary: "hsl(var(--neon-magenta))",
     Harassment: "hsl(var(--neon-purple))",
     Murder: "hsl(var(--neon-red))",
+    Kidnapping: "hsl(var(--neon-magenta))",
   };
   return map[type] || "hsl(var(--neon-cyan))";
 };
@@ -78,7 +149,7 @@ const NewsFeedPage = () => {
         </button>
         <div>
           <h1 className="text-lg font-bold font-display gradient-neon-text">Crime News</h1>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Tamil Nadu · Real-time</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Tamil Nadu · Women Safety · Real-time</p>
         </div>
       </header>
 
@@ -88,7 +159,7 @@ const NewsFeedPage = () => {
             key={news.id}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
+            transition={{ delay: i * 0.07 }}
             className="glass rounded-xl p-4"
           >
             {news.breaking && (

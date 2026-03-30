@@ -68,7 +68,7 @@ const LoginPage = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl gradient-neon mb-3 neon-glow-cyan">
             <Shield className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold font-display gradient-neon-text">AI GUARDIAN</h1>
+          <h1 className="text-2xl font-bold font-display gradient-neon-text">TRUVIA PATH</h1>
           <p className="text-muted-foreground mt-1 text-sm">Your AI-Powered Safety Companion</p>
         </motion.div>
 

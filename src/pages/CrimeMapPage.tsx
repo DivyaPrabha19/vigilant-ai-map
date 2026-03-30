@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Search, AlertTriangle, Info, Lightbulb } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import L from "leaflet";
@@ -21,11 +21,28 @@ const CrimeMapPage = () => {
   const [selectedLight, setSelectedLight] = useState<StreetLight | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showLights, setShowLights] = useState(true);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const lightMarkersRef = useRef<L.Marker[]>([]);
+
+  // Build searchable locations list
+  const allLocations = useMemo(() => {
+    const locs: { label: string; type: string; lat: number; lng: number; districtSlug?: string }[] = [];
+    tamilNaduDistricts.forEach((d) => {
+      locs.push({ label: d.district, type: "District", lat: d.lat, lng: d.lng, districtSlug: d.district.toLowerCase().replace(/\s+/g, "-") });
+      d.mainTowns.forEach((t) => locs.push({ label: `${t}, ${d.district}`, type: "Town", lat: d.lat, lng: d.lng, districtSlug: d.district.toLowerCase().replace(/\s+/g, "-") }));
+    });
+    crimeData.forEach((c) => locs.push({ label: c.location, type: "Crime Zone", lat: c.lat, lng: c.lng }));
+    return locs;
+  }, []);
+
+  const suggestions = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    return allLocations.filter((l) => l.label.toLowerCase().includes(q)).slice(0, 8);
+  }, [searchQuery, allLocations]);
 
   const selectCrime = (crime: CrimeEntry) => {
     setSelectedLight(null);
-    // Compute adjusted intensity based on nearby lights
     const nearby = allLights.filter(
       (l) => Math.abs(l.lat - crime.lat) < 0.05 && Math.abs(l.lng - crime.lng) < 0.05
     );
@@ -48,7 +65,6 @@ const CrimeMapPage = () => {
       maxZoom: 19,
     }).addTo(map);
 
-    // District markers (clickable → graph page)
     tamilNaduDistricts.forEach((dist) => {
       const color = getDistrictColor(dist.intensity);
       const size = Math.max(22, dist.intensity / 2.5);
@@ -65,7 +81,6 @@ const CrimeMapPage = () => {
       });
     });
 
-    // Crime markers (individual incidents)
     crimeData.forEach((crime) => {
       const color = getColor(crime.intensity);
       const size = Math.max(14, crime.intensity / 3);
@@ -78,7 +93,6 @@ const CrimeMapPage = () => {
       L.marker([crime.lat, crime.lng], { icon }).addTo(map).on("click", () => selectCrime(crime));
     });
 
-    // Street light markers
     const markers: L.Marker[] = [];
     allLights.forEach((light) => {
       const c = getLightColor(light.status);
@@ -100,7 +114,6 @@ const CrimeMapPage = () => {
     return () => { map.remove(); mapInstance.current = null; };
   }, []);
 
-  // Toggle street light visibility
   useEffect(() => {
     lightMarkersRef.current.forEach((m) => {
       const el = m.getElement();
@@ -108,27 +121,36 @@ const CrimeMapPage = () => {
     });
   }, [showLights]);
 
-  const handleSearch = () => {
-    const q = searchQuery.toLowerCase();
-    // Search districts first
+  const handleSearch = (query?: string) => {
+    const q = (query || searchQuery).toLowerCase();
+    setShowSuggestions(false);
     const dist = tamilNaduDistricts.find((d) => d.district.toLowerCase().includes(q) || d.mainTowns.some((t) => t.toLowerCase().includes(q)));
     if (dist && mapInstance.current) {
       mapInstance.current.flyTo([dist.lat, dist.lng], 11, { duration: 1.5 });
       navigate(`/district/${dist.district.toLowerCase().replace(/\s+/g, "-")}`);
       return;
     }
-    // Search in crimes
     const found = crimeData.find((c) => c.location.toLowerCase().includes(q));
     if (found && mapInstance.current) {
       mapInstance.current.flyTo([found.lat, found.lng], 13, { duration: 1.5 });
       selectCrime(found);
       return;
     }
-    // Search in street lights
     const light = allLights.find((l) => l.street.toLowerCase().includes(q));
     if (light && mapInstance.current) {
       mapInstance.current.flyTo([light.lat, light.lng], 16, { duration: 1.5 });
       selectLight(light);
+    }
+  };
+
+  const handleSuggestionClick = (sug: typeof allLocations[0]) => {
+    setSearchQuery(sug.label);
+    setShowSuggestions(false);
+    if (sug.districtSlug) {
+      if (mapInstance.current) mapInstance.current.flyTo([sug.lat, sug.lng], 11, { duration: 1.5 });
+      navigate(`/district/${sug.districtSlug}`);
+    } else {
+      handleSearch(sug.label);
     }
   };
 
@@ -142,7 +164,6 @@ const CrimeMapPage = () => {
           <h1 className="text-lg font-bold font-display gradient-neon-text">Crime Heatmap</h1>
           <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Tamil Nadu · Live</p>
         </div>
-        {/* Street Light Toggle */}
         <button
           onClick={() => setShowLights(!showLights)}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${showLights ? "bg-neon-green/20 text-neon-green border border-neon-green/30" : "glass text-muted-foreground"}`}
@@ -158,20 +179,46 @@ const CrimeMapPage = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search location or street (e.g., DB Road)"
+              placeholder="Search district, town or street..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => { setSearchQuery(e.target.value); setShowSuggestions(true); }}
+              onFocus={() => searchQuery.trim() && setShowSuggestions(true)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-muted/50 border border-border text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
             />
+            {/* Suggestions dropdown */}
+            <AnimatePresence>
+              {showSuggestions && suggestions.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  className="absolute top-full left-0 right-0 mt-1 glass-strong rounded-xl overflow-hidden border border-border max-h-64 overflow-y-auto"
+                >
+                  {suggestions.map((sug, i) => (
+                    <button
+                      key={`${sug.label}-${i}`}
+                      onClick={() => handleSuggestionClick(sug)}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-left hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0"
+                    >
+                      <MapPin className="w-3.5 h-3.5 text-neon-cyan flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-foreground truncate">{sug.label}</p>
+                      </div>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider flex-shrink-0">{sug.type}</span>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-          <motion.button whileTap={{ scale: 0.95 }} onClick={handleSearch} className="px-4 rounded-xl gradient-neon text-primary-foreground text-sm font-semibold">
+          <motion.button whileTap={{ scale: 0.95 }} onClick={() => handleSearch()} className="px-4 rounded-xl gradient-neon text-primary-foreground text-sm font-semibold">
             Go
           </motion.button>
         </div>
       </div>
 
-      <div className="flex-1 relative">
+      <div className="flex-1 relative" onClick={() => setShowSuggestions(false)}>
         <div ref={mapRef} className="absolute inset-0" />
 
         {/* Legend */}
@@ -252,7 +299,7 @@ const CrimeMapPage = () => {
                   <div className="flex items-start gap-2">
                     <Info className="w-3.5 h-3.5 text-neon-cyan mt-0.5 flex-shrink-0" />
                     <p className="text-[11px] text-muted-foreground leading-relaxed">
-                      This area is marked <span className="font-semibold" style={{ color: getColor(selectedCrime.intensity) }}>{getRiskLabel(selectedCrime.intensity).toLowerCase()} risk</span> due to recent {selectedCrime.type.toLowerCase()} cases and repeated incidents in the same area.
+                      This area is marked <span className="font-semibold" style={{ color: getColor(selectedCrime.intensity) }}>{getRiskLabel(selectedCrime.intensity).toLowerCase()} risk</span> due to recent {selectedCrime.type.toLowerCase()} cases.
                       {selectedCrime.isDark && " Risk score adjusted (+) due to poor street lighting conditions."}
                     </p>
                   </div>
@@ -262,7 +309,6 @@ const CrimeMapPage = () => {
           </motion.div>
         )}
 
-        {/* Street light detail panel */}
         {selectedLight && (
           <StreetLightPanel light={selectedLight} onClose={() => setSelectedLight(null)} />
         )}
